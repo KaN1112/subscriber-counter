@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7f4">
+  <meta name="description" content="YouTube Studioの登録者数をOBSに表示する、無料の背景透過カウンター。目標人数を自由に設定できます。">
+  <title>OBS登録者カウンター｜YouTube Studio連携</title>
+  <style>
+    :root {
+      --paper: #f7f7f4;
+      --ink: #181b1b;
+      --sub: #686d6d;
+      --line: #d6d8d5;
+      --blue: #1676a7;
+      --white: #ffffff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+      font-size: 15px;
+      line-height: 1.85;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; }
+    a:focus-visible, summary:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
+    ::selection { background: #bce4f1; }
+
+    .container { width: min(100% - 56px, 940px); margin: 0 auto; }
+
+    .site-header { border-bottom: 1px solid var(--line); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 78px; }
+    .site-name { display: inline-flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 800; letter-spacing: .01em; text-decoration: none; }
+    .header-link { font-size: 13px; font-weight: 700; text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 2px; white-space: nowrap; }
+    .header-link:hover { color: var(--blue); }
+
+    .hero { padding: 91px 0 75px; }
+    .eyebrow { margin: 0 0 20px; color: var(--blue); font-size: 12px; font-weight: 800; letter-spacing: .11em; }
+    h1 { margin: 0; font-size: clamp(19px, 6vw, 61px); font-weight: 850; letter-spacing: -.045em; line-height: 1.42; white-space: nowrap; }
+    .lead { margin: 25px 0 0; font-size: 17px; line-height: 2; color: #474d4d; }
+    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 16px 22px; margin-top: 34px; }
+    .primary-link { display: inline-flex; align-items: center; justify-content: center; gap: 22px; min-height: 51px; padding: 10px 22px; background: var(--ink); color: var(--white); font-size: 14px; font-weight: 800; text-decoration: none; transition: background .18s ease; }
+    .primary-link:hover { background: #2e555e; }
+    .primary-link span { font-size: 19px; line-height: 1; }
+    .version { font-size: 12px; color: var(--sub); }
+
+    .section { padding: 100px 0 0; }
+    .section-heading { margin: 0 0 29px; font-size: 24px; letter-spacing: -.025em; font-weight: 850; line-height: 1.5; }
+
+    .feature-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 29px; border-top: 1px solid var(--ink); padding-top: 25px; }
+    .feature h3 { margin: 0 0 8px; font-size: 16px; font-weight: 850; }
+    .feature p { margin: 0; font-size: 13px; color: var(--sub); line-height: 1.95; }
+
+    .steps { border-top: 1px solid var(--ink); }
+    .step { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 8px; padding: 25px 0 26px; border-bottom: 1px solid var(--line); }
+    .step-number { font-size: 12px; line-height: 2.2; font-weight: 800; color: var(--blue); font-variant-numeric: tabular-nums; }
+    .step h3 { margin: 0 0 7px; font-size: 16px; font-weight: 850; }
+    .step p { margin: 0; font-size: 14px; color: #525858; }
+    .step p + p { margin-top: 8px; }
+    code { font-family: Consolas, Menlo, monospace; font-size: .89em; overflow-wrap: anywhere; background: #e9ece9; padding: 2px 5px; color: var(--ink); }
+    .inline-link { color: var(--blue); text-underline-offset: 3px; }
+
+    .download-panel { margin-top: 70px; padding: 30px 0 34px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+    .download-panel h2 { margin: 0 0 7px; font-size: 21px; font-weight: 850; }
+    .download-panel p { margin: 0; font-size: 13px; color: var(--sub); }
+    .download-panel .primary-link { flex-shrink: 0; }
+    .small-link { margin-top: 13px; font-size: 12px; color: var(--sub); }
+    .small-link a { text-underline-offset: 3px; }
+
+    .details-group { margin-top: 27px; border-top: 1px solid var(--line); }
+    details { border-bottom: 1px solid var(--line); }
+    summary { padding: 17px 24px 17px 0; cursor: pointer; font-size: 14px; font-weight: 750; position: relative; list-style: none; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; position: absolute; right: 2px; top: 16px; font-size: 17px; font-weight: 400; }
+    details[open] summary::after { content: '−'; }
+    .details-copy { padding: 0 0 20px; max-width: 780px; color: var(--sub); font-size: 13px; }
+    .details-copy p { margin: 0 0 9px; }
+    .details-copy p:last-child { margin-bottom: 0; }
+
+    .footnote { color: var(--sub); font-size: 12px; margin: 27px 0 0; line-height: 1.9; }
+    .site-footer { margin-top: 110px; padding: 25px 0 40px; border-top: 1px solid var(--line); color: var(--sub); font-size: 12px; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 20px; }
+    .footer-inner p { margin: 0; }
+
+    @media (max-width: 700px) {
+      .container { width: min(100% - 36px, 940px); }
+      .header-inner { min-height: 66px; }
+      .site-name { font-size: 12px; gap: 8px; }
+      .header-link { font-size: 12px; }
+      .hero { padding: 70px 0 55px; }
+      h1 { font-size: clamp(19px, 6vw, 42px); letter-spacing: -.045em; }
+      .lead { font-size: 14px; margin-top: 22px; }
+      .hero-actions { margin-top: 27px; }
+      .section { padding-top: 76px; }
+      .section-heading { font-size: 22px; margin-bottom: 22px; }
+      .feature-row { grid-template-columns: 1fr; gap: 23px; padding-top: 23px; }
+      .download-panel { display: block; margin-top: 55px; }
+      .download-panel .primary-link { margin-top: 21px; }
+      .site-footer { margin-top: 75px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .primary-link { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="site-name" href="#top">OBS登録者カウンター</a>
+      <a class="header-link" href="#download">ダウンロード</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero container" aria-labelledby="main-heading">
+      <p class="eyebrow">YOUTUBE STUDIO × OBS</p>
+      <h1 id="main-heading">登録者数を、配信画面に。</h1>
+      <p class="lead">YouTube Studioの登録者数をOBSに表示する無料ツール。<br>目標人数を設定して、<strong>777 / 1000</strong> のように表示できます。</p>
+      <div class="hero-actions">
+        <a class="primary-link" href="downloads/youtube-studio-obs-counter-v1.1.0.zip" download>無料でダウンロード <span aria-hidden="true">↓</span></a>
+        <span class="version">v1.1.0 ／ Windows・macOS・Linux</span>
+      </div>
+    </section>
+
+    <section class="section container" aria-labelledby="features-title">
+      <h2 class="section-heading" id="features-title">できること</h2>
+      <div class="feature-row">
+        <div class="feature"><h3>自動更新</h3><p>YouTube Studioの登録者数の変化を検知して、OBSの表示を更新します。</p></div>
+        <div class="feature"><h3>目標人数を設定</h3><p>100人、1,000人など自由に設定。文字色・大きさ・縁取りも変更できます。</p></div>
+        <div class="feature"><h3>背景は透明</h3><p>配信画面に数字だけを重ねられます。専用の背景画像は不要です。</p></div>
+      </div>
+    </section>
+
+    <section class="section container" aria-labelledby="setup-title">
+      <h2 class="section-heading" id="setup-title">導入方法</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">01</div>
+          <div><h3>ダウンロードして起動</h3><p>ZIPを解凍し、Windowsでは <code>start.cmd</code> を起動します。設定画面 <code>http://127.0.0.1:4751/</code> で目標人数を設定します。</p><p>事前に <a class="inline-link" href="https://nodejs.org/" target="_blank" rel="noopener noreferrer">Node.js（18以上）</a> をインストールしてください。</p></div>
+        </div>
+        <div class="step">
+          <div class="step-number">02</div>
+          <div><h3>YouTube Studioと連携</h3><p>Chromeの <code>chrome://extensions</code> でデベロッパーモードを有効にし、同梱の <code>extension</code> フォルダーを読み込みます。自分のYouTube Studioで現在の登録者数を表示し、拡張機能から「数字を選択」します。</p></div>
+        </div>
+        <div class="step">
+          <div class="step-number">03</div>
+          <div><h3>OBSに追加</h3><p>OBSの「ソース → ＋ → ブラウザ」で、URLに <code>http://127.0.0.1:4751/overlay</code> を入力します。幅600・高さ100が目安です。</p><p>配信中は起動したサーバーとYouTube Studioのタブを開いておいてください。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container" id="download" aria-labelledby="download-title">
+      <div class="download-panel">
+        <div>
+          <h2 id="download-title">ダウンロード</h2>
+          <p>本体・Chrome拡張機能・説明書が入ったZIPファイルです。無料で利用できます。</p>
+        </div>
+        <a class="primary-link" href="downloads/youtube-studio-obs-counter-v1.1.0.zip" download>ZIPをダウンロード <span aria-hidden="true">↓</span></a>
+      </div>
+      <p class="small-link">Chrome拡張機能だけを取得する場合：<a href="downloads/youtube-studio-obs-extension-v1.1.0.zip" download>拡張機能 ZIP</a></p>
+
+      <div class="details-group">
+        <details>
+          <summary>Mac・Linuxでの起動方法</summary>
+          <div class="details-copy"><p>Node.js 18以上をインストールし、解凍したフォルダーでターミナルを開いて <code>node server.js</code> を実行してください。その他の手順はWindowsと同じです。</p></div>
+        </details>
+        <details>
+          <summary>登録者数が更新されない場合</summary>
+          <div class="details-copy"><p>YouTube Studioのタブを前面に表示し、拡張機能で数字を再選択してください。Studio側の集計には遅延があり、ブラウザの省電力機能やStudioの表示変更によって取得が止まる場合もあります。</p><p>「---/1000」のままなら、ローカルサーバーが起動しているかと、Studio側で数値を選択できているかを確認してください。</p></div>
+        </details>
+        <details>
+          <summary>ログイン情報は送信されますか？</summary>
+          <div class="details-copy"><p>このツールは自分のPC上で動作し、連携に必要な登録者数とチャンネルIDをローカルサーバーに渡します。GoogleのパスワードやログインCookieは取得しません。外部サーバーへの会員登録は不要です。</p></div>
+        </details>
+      </div>
+      <p class="footnote">※ 非公式ツールです。YouTube / Google / OBSの公式製品ではありません。YouTube Studioの表示が更新されるタイミングに依存するため、秒単位の完全なリアルタイム更新は保証されません。</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>OBS登録者カウンター</p>
+      <p>当サイトはAIで作成。</p>
+    </div>
+  </footer>
+</body>
+</html>
