@@ -12,7 +12,7 @@
 * { box-sizing: border-box; }
 
 body {
-  width: 420px;
+  width: 600px;
   margin: 0;
   color: var(--ink);
   background: var(--paper);
@@ -21,21 +21,23 @@ body {
   line-height: 1.65;
 }
 
-header { padding: 18px 20px 14px; border-bottom: 1px solid var(--line); }
+header { padding: 16px 22px 12px; border-bottom: 1px solid var(--line); }
 h1 { margin: 0; font-size: 17px; }
 #global-message { min-height: 20px; margin: 5px 0 0; color: var(--sub); font-size: 12px; }
-main { padding: 0 20px 22px; }
-section { padding: 22px 0; border-bottom: 1px solid var(--line); }
+main { padding: 0 22px 18px; }
+section { padding: 18px 0; border-bottom: 1px solid var(--line); }
 section:last-child { border-bottom: 0; }
 h2 { margin: 0 0 14px; font-size: 15px; }
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .section-heading h2 { margin-bottom: 0; }
 .badge { padding: 2px 7px; border: 1px solid var(--line); font-size: 11px; font-weight: 700; }
 .experimental { color: var(--blue); border-color: #99c4d8; }
-.status-list { margin: 15px 0 0; border-top: 1px solid var(--line); }
-.status-list div { display: grid; grid-template-columns: 130px 1fr; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.status-list { display: grid; grid-template-columns: repeat(3, 1fr); margin: 14px 0 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.status-list div { min-width: 0; padding: 9px 12px; border-right: 1px solid var(--line); }
+.status-list div:first-child { padding-left: 0; }
+.status-list div:last-child { padding-right: 0; border-right: 0; }
 .status-list dt { color: var(--sub); }
-.status-list dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+.status-list dd { margin: 2px 0 0; font-weight: 700; overflow-wrap: anywhere; }
 .notice, .field-help { margin: 11px 0 0; color: var(--sub); font-size: 11px; }
 label { display: block; margin-top: 13px; color: var(--sub); font-size: 12px; font-weight: 700; }
 input, select, button, .button-link { font: inherit; }
@@ -47,7 +49,7 @@ input:disabled { color: var(--sub); background: var(--soft); }
 .check-row input { width: 16px; min-height: 16px; margin: 3px 0 0; }
 .button-row { display: flex; gap: 9px; margin-top: 14px; }
 .button-row.compact { margin-top: 9px; }
-button, .button-link { min-height: 38px; padding: 7px 13px; border: 1px solid #aeb5b5; border-radius: 0; color: var(--ink); background: #fff; cursor: pointer; text-align: center; text-decoration: none; }
+button, .button-link { min-height: 38px; padding: 7px 13px; border: 1px solid #aeb5b5; border-radius: 0; color: var(--ink); background: #fff; cursor: pointer; text-align: center; text-decoration: none; white-space: nowrap; }
 button:hover, .button-link:hover { border-color: var(--ink); }
 button.primary { border-color: var(--ink); color: #fff; background: var(--ink); }
 button.primary:hover { background: #303535; }
@@ -64,6 +66,10 @@ summary { cursor: pointer; font-weight: 700; }
 .preview span { font-size: 27px; font-weight: 800; font-variant-numeric: tabular-nums; }
 code { color: var(--ink); }
 
-@media (max-width: 440px) {
+@media (max-width: 480px) {
   body { width: 100vw; }
+  .status-list { grid-template-columns: 1fr; }
+  .status-list div { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 12px; padding: 8px 0; border-right: 0; border-bottom: 1px solid var(--line); }
+  .status-list div:last-child { border-bottom: 0; }
+  .status-list dd { margin-top: 0; }
 }
