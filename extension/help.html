@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>使い方｜OBS登録者カウンター</title>
+  <link rel="stylesheet" href="help.css">
+</head>
+<body>
+  <main>
+    <h1>OBS登録者カウンターの使い方</h1>
+    <section>
+      <h2>1. OBS WebSocketを有効にする</h2>
+      <p>OBS Studio 28以降で「ツール」からWebSocketサーバー設定を開き、サーバーを有効にします。ポートは通常4455です。認証を有効にし、パスワードを設定してください。</p>
+    </section>
+    <section>
+      <h2>2. OBSへ接続する</h2>
+      <p>拡張機能を開き、接続先、ポート、パスワードを入力して「接続」を押します。接続後、既存のテキストソースを選ぶか、専用ソースを作成します。</p>
+    </section>
+    <section>
+      <h2>3. 登録者数を選択する</h2>
+      <p>YouTube Studioでリアルタイム登録者数が整数で表示された画面を開きます。拡張機能の「登録者数を選択」を押し、画面上の数字をクリックします。</p>
+      <p>この自動取得はYouTube Studioの画面構造に依存する実験的機能です。取得できない場合は手動更新を使用してください。</p>
+    </section>
+    <section>
+      <h2>4. 表示を設定する</h2>
+      <p>目標登録者数、区切り文字、表示形式を設定し、保存します。文字色、フォント、サイズ、縁取りはOBSのテキストソース設定で変更します。</p>
+    </section>
+    <section>
+      <h2>安全について</h2>
+      <p>登録者数、OBSパスワード、YouTubeの画面情報を外部サーバーへ送信しません。接続先はlocalhostに限定しています。パスワードは保存を選んだ場合だけChromeのローカルストレージに保存されます。</p>
+    </section>
+  </main>
+</body>
+</html>

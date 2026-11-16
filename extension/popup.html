@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OBS登録者カウンター</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <h1>OBS登録者カウンター</h1>
+    <p id="global-message" role="status"></p>
+  </header>
+
+  <main>
+    <section aria-labelledby="youtube-title">
+      <div class="section-heading">
+        <h2 id="youtube-title">YouTube</h2>
+        <span class="badge experimental">実験的機能</span>
+      </div>
+      <dl class="status-list">
+        <div><dt>現在の登録者数</dt><dd id="current-value">未取得</dd></div>
+        <div><dt>最終取得時刻</dt><dd id="captured-at">未取得</dd></div>
+        <div><dt>取得状態</dt><dd id="youtube-status">未選択</dd></div>
+      </dl>
+      <p class="notice">YouTube Studioを開いたまま、画面に表示された整数を選択します。画面を閉じると自動取得は停止します。</p>
+      <div class="button-row">
+        <button id="select-number" type="button" class="primary">登録者数を選択</button>
+        <button id="reselect-number" type="button">再選択</button>
+      </div>
+      <div class="manual-row">
+        <label for="manual-current">手動更新</label>
+        <input id="manual-current" type="text" inputmode="numeric" autocomplete="off" placeholder="777">
+        <button id="manual-update" type="button">反映</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="obs-title">
+      <div class="section-heading">
+        <h2 id="obs-title">OBS</h2>
+        <span id="obs-status" class="badge">未接続</span>
+      </div>
+      <div class="two-columns">
+        <label>接続先<input id="host" type="text" value="127.0.0.1" autocomplete="off"></label>
+        <label>ポート番号<input id="port" type="number" min="1" max="65535" value="4455"></label>
+      </div>
+      <label>WebSocketパスワード<input id="password" type="password" autocomplete="new-password"></label>
+      <label class="check-row"><input id="save-password" type="checkbox">この端末にパスワードを保存する</label>
+      <div class="button-row">
+        <button id="connect" type="button" class="primary">接続</button>
+        <button id="disconnect" type="button">切断</button>
+      </div>
+      <label>更新対象テキストソース
+        <select id="input-name"><option value="">接続後に選択</option></select>
+      </label>
+      <div class="button-row compact">
+        <button id="refresh-sources" type="button">一覧を更新</button>
+        <button id="force-update" type="button">現在値を再送信</button>
+      </div>
+      <details>
+        <summary>専用テキストソースを作成</summary>
+        <label>追加先シーン<select id="scene-name"><option value="">接続後に選択</option></select></label>
+        <label>ソース名<input id="new-input-name" type="text" value="OBS登録者カウンター" maxlength="80"></label>
+        <button id="create-source" type="button">テキストソースを作成</button>
+      </details>
+    </section>
+
+    <section aria-labelledby="counter-title">
+      <h2 id="counter-title">カウンター</h2>
+      <div class="two-columns">
+        <label>現在の登録者数<input id="current-display" type="text" disabled></label>
+        <label>目標登録者数<input id="target" type="text" inputmode="numeric" value="1000"></label>
+      </div>
+      <label>区切り文字<input id="separator" type="text" value=" / " maxlength="12"></label>
+      <label>表示形式<input id="template" type="text" value="{current}{separator}{target}" maxlength="120"></label>
+      <p class="field-help"><code>{current}</code>、<code>{separator}</code>、<code>{target}</code>を使用できます。</p>
+      <label class="check-row"><input id="auto-target" type="checkbox">目標到達時に目標数を自動で繰り上げる</label>
+      <div class="preview" aria-label="OBS表示プレビュー"><span id="preview">--- / 1,000</span></div>
+      <button id="save-settings" type="button" class="primary wide">設定を保存してOBSへ反映</button>
+    </section>
+
+    <section aria-labelledby="other-title">
+      <h2 id="other-title">その他</h2>
+      <label class="check-row"><input id="auto-connect" type="checkbox" checked>OBSへ自動接続する</label>
+      <div class="button-row">
+        <a class="button-link" href="help.html" target="_blank">使い方</a>
+        <button id="reset-settings" type="button" class="danger">設定をリセット</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="shared.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
