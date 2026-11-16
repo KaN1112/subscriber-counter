@@ -35,7 +35,6 @@ const formatDate = value => {
 const renderState = state => {
   const { settings, obs, youtubeActive, preview } = state;
   elements['current-value'].textContent = settings.current ?? '未取得';
-  elements['current-display'].value = settings.current ?? '';
   elements['manual-current'].value = settings.current ?? '';
   elements['captured-at'].textContent = formatDate(settings.lastCapturedAt);
   elements['youtube-status'].textContent = youtubeActive ? settings.youtubeStatus : settings.selectedSelector ? '停止中・Studioを開いてください' : settings.youtubeStatus;
@@ -59,6 +58,11 @@ const renderState = state => {
   obs.scenes.forEach(scene => elements['scene-name'].append(option(scene.sceneName, scene.sceneName)));
 
   const connected = obs.status === '接続済み';
+  elements['quick-help'].textContent = !connected
+    ? '最初にOBSへ接続してください。'
+    : settings.inputName
+      ? '入力した数字をすぐにOBSへ反映できます。'
+      : '更新対象のテキストソースを選択してください。';
   elements.connect.disabled = connected;
   elements.disconnect.disabled = !connected;
   elements['refresh-sources'].disabled = !connected;
@@ -92,9 +96,19 @@ elements['select-number'].addEventListener('click', () => withAction(startSelect
 elements['reselect-number'].addEventListener('click', () => withAction(startSelection));
 
 elements['manual-update'].addEventListener('click', () => withAction(() => send({
-  type: 'manualUpdate',
-  value: elements['manual-current'].value
+  type: 'quickUpdate',
+  value: elements['manual-current'].value,
+  inputName: elements['input-name'].value,
+  target: elements.target.value,
+  separator: elements.separator.value,
+  template: elements.template.value
 })));
+
+elements['input-name'].addEventListener('change', () => {
+  elements['quick-help'].textContent = elements['input-name'].value
+    ? '入力した数字をすぐにOBSへ反映できます。'
+    : '更新対象のテキストソースを選択してください。';
+});
 
 elements.connect.addEventListener('click', () => withAction(() => send({
   type: 'connectObs',

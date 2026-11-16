@@ -24,6 +24,10 @@ body {
 header { padding: 16px 22px 12px; border-bottom: 1px solid var(--line); }
 h1 { margin: 0; font-size: 17px; }
 #global-message { min-height: 20px; margin: 5px 0 0; color: var(--sub); font-size: 12px; }
+.setup-guide { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 10px 0 0; padding: 0; list-style: none; counter-reset: guide; }
+.setup-guide li { padding: 7px 10px; border: 1px solid var(--line); border-right: 0; color: var(--sub); font-size: 11px; counter-increment: guide; }
+.setup-guide li:last-child { border-right: 1px solid var(--line); }
+.setup-guide li::before { margin-right: 6px; color: var(--blue); font-weight: 800; content: counter(guide); }
 main { padding: 0 22px 18px; }
 section { padding: 18px 0; border-bottom: 1px solid var(--line); }
 section:last-child { border-bottom: 0; }
@@ -56,10 +60,9 @@ button.primary:hover { background: #303535; }
 button.wide { width: 100%; margin-top: 15px; }
 button.danger { color: var(--red); }
 button:disabled { cursor: not-allowed; opacity: .55; }
-.manual-row { display: grid; grid-template-columns: 90px 1fr auto; align-items: end; gap: 9px; margin-top: 15px; }
-.manual-row label { margin: 0 0 8px; }
-.manual-row input { margin: 0; }
+.manual-row { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px; margin-top: 12px; padding: 12px; background: var(--soft); }
 .manual-row button { min-height: 38px; }
+#quick-help { margin: 7px 0 0; color: var(--sub); font-size: 11px; }
 details { margin-top: 15px; padding-top: 12px; border-top: 1px solid var(--line); }
 summary { cursor: pointer; font-weight: 700; }
 .preview { margin-top: 15px; padding: 19px 12px; border: 1px solid var(--line); background: var(--soft); text-align: center; }
@@ -72,4 +75,8 @@ code { color: var(--ink); }
   .status-list div { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 12px; padding: 8px 0; border-right: 0; border-bottom: 1px solid var(--line); }
   .status-list div:last-child { border-bottom: 0; }
   .status-list dd { margin-top: 0; }
+  .setup-guide { grid-template-columns: 1fr; }
+  .setup-guide li { border-right: 1px solid var(--line); border-bottom: 0; }
+  .setup-guide li:last-child { border-bottom: 1px solid var(--line); }
+  .manual-row { grid-template-columns: 1fr; }
 }

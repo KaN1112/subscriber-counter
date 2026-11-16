@@ -7,6 +7,28 @@ let documentObserver = null;
 let selecting = false;
 let hoveredElement = null;
 let lastValue = null;
+let guideElement = null;
+
+const showSelectionGuide = () => {
+  guideElement?.remove();
+  guideElement = document.createElement('div');
+  guideElement.textContent = '登録者数の数字をクリックしてください　Escで中止';
+  Object.assign(guideElement.style, {
+    position: 'fixed',
+    zIndex: '2147483647',
+    top: '16px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    padding: '12px 18px',
+    color: '#ffffff',
+    background: '#181b1b',
+    fontFamily: 'sans-serif',
+    fontSize: '14px',
+    fontWeight: '700',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, .2)'
+  });
+  document.documentElement.append(guideElement);
+};
 
 const selectorFor = element => {
   if (element.id && /^[A-Za-z][\w:-]*$/.test(element.id)) return `#${CSS.escape(element.id)}`;
@@ -77,6 +99,8 @@ const clearHighlight = () => {
 
 const stopSelection = () => {
   selecting = false;
+  guideElement?.remove();
+  guideElement = null;
   clearHighlight();
   document.removeEventListener('mouseover', onMouseOver, true);
   document.removeEventListener('click', onSelect, true);
@@ -115,6 +139,7 @@ const onSelect = event => {
 const startSelection = () => {
   if (selecting) return;
   selecting = true;
+  showSelectionGuide();
   document.addEventListener('mouseover', onMouseOver, true);
   document.addEventListener('click', onSelect, true);
   document.addEventListener('keydown', onSelectionKey, true);

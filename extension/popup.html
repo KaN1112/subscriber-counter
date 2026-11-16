@@ -10,6 +10,11 @@
   <header>
     <h1>OBS登録者カウンター</h1>
     <p id="global-message" role="status"></p>
+    <ol class="setup-guide" aria-label="設定の順番">
+      <li>数字を選ぶ</li>
+      <li>OBS接続</li>
+      <li>ソース選択・反映</li>
+    </ol>
   </header>
 
   <main>
@@ -27,11 +32,6 @@
       <div class="button-row">
         <button id="select-number" type="button" class="primary">登録者数を選択</button>
         <button id="reselect-number" type="button">再選択</button>
-      </div>
-      <div class="manual-row">
-        <label for="manual-current">手動更新</label>
-        <input id="manual-current" type="text" inputmode="numeric" autocomplete="off" placeholder="777">
-        <button id="manual-update" type="button">反映</button>
       </div>
     </section>
 
@@ -68,7 +68,7 @@
     <section aria-labelledby="counter-title">
       <h2 id="counter-title">カウンター</h2>
       <div class="two-columns">
-        <label>現在の登録者数<input id="current-display" type="text" disabled></label>
+        <label>現在の登録者数<input id="manual-current" type="text" inputmode="numeric" autocomplete="off" placeholder="777"></label>
         <label>目標登録者数<input id="target" type="text" inputmode="numeric" value="1000"></label>
       </div>
       <label>区切り文字<input id="separator" type="text" value=" / " maxlength="12"></label>
@@ -76,6 +76,10 @@
       <p class="field-help"><code>{current}</code>、<code>{separator}</code>、<code>{target}</code>を使用できます。</p>
       <label class="check-row"><input id="auto-target" type="checkbox">目標到達時に目標数を自動で繰り上げる</label>
       <div class="preview" aria-label="OBS表示プレビュー"><span id="preview">--- / 1,000</span></div>
+      <div class="manual-row">
+        <button id="manual-update" type="button" class="primary">この数字をOBSへ反映</button>
+        <p id="quick-help">OBSへ接続してテキストソースを選ぶと反映できます。</p>
+      </div>
       <button id="save-settings" type="button" class="primary wide">設定を保存してOBSへ反映</button>
     </section>
 

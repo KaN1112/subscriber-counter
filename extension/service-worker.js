@@ -290,6 +290,30 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       await updateObsText(false);
       return publicState();
     }
+    if (message.type === 'quickUpdate') {
+      if (runtimeState.status !== '接続済み') throw new Error('先にOBSへ接続してください。');
+      const value = CounterUtils.parseSubscriberCount(message.value);
+      const target = CounterUtils.parsePositiveInteger(message.target);
+      const inputName = String(message.inputName || '').trim();
+      const template = String(message.template || '').slice(0, 120);
+      if (value === null) throw new Error('現在の登録者数は0以上の整数にしてください。');
+      if (!target) throw new Error('目標登録者数は1以上の整数にしてください。');
+      if (!inputName) throw new Error('更新対象のテキストソースを選択してください。');
+      if (!template.includes('{current}') || !template.includes('{target}')) {
+        throw new Error('表示形式には{current}と{target}が必要です。');
+      }
+      await chrome.storage.local.set({
+        current: value,
+        target,
+        inputName,
+        separator: String(message.separator || '').slice(0, 12),
+        template,
+        lastCapturedAt: new Date().toISOString(),
+        youtubeStatus: '手動更新'
+      });
+      await updateObsText(true);
+      return publicState();
+    }
     if (message.type === 'forceUpdate') {
       await updateObsText(true);
       return publicState();
