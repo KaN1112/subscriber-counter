@@ -33,6 +33,15 @@
     return parseSubscriberCount(matches[0]);
   };
 
+  const parseSelectedSubscriberCount = value => {
+    const normalized = String(value ?? '')
+      .replace(/[０-９]/g, digit => String.fromCharCode(digit.charCodeAt(0) - 0xFEE0))
+      .replace(/[\u200B-\u200D\uFEFF]/g, '');
+    if (!normalized || /[^\d\p{P}\p{Z}\s]/u.test(normalized)) return null;
+    const digits = normalized.replace(/\D/g, '');
+    return digits ? parseSubscriberCount(digits) : null;
+  };
+
   const extractLikelySubscriberCount = value => {
     let normalized = String(value ?? '')
       .replace(/[０-９]/g, digit => String.fromCharCode(digit.charCodeAt(0) - 0xFEE0))
@@ -138,6 +147,7 @@
     parseSubscriberCount,
     parsePositiveInteger,
     extractSubscriberCount,
+    parseSelectedSubscriberCount,
     extractLikelySubscriberCount,
     findBestSubscriberCandidate,
     formatCounter,

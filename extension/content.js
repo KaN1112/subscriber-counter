@@ -1,4 +1,4 @@
-const { extractSubscriberCount, findBestSubscriberCandidate } = CounterUtils;
+const { extractSubscriberCount, parseSelectedSubscriberCount, findBestSubscriberCandidate } = CounterUtils;
 
 let selectedElement = null;
 let selectedSelector = '';
@@ -121,7 +121,7 @@ const subscriberTextsForElement = element => [
 
 const subscriberValueForElement = element => {
   const candidate = findBestSubscriberCandidate(
-    subscriberTextsForElement(element).map(extractSubscriberCount)
+    subscriberTextsForElement(element).map(value => parseSelectedSubscriberCount(value) ?? extractSubscriberCount(value))
   );
   return candidate?.value ?? null;
 };
@@ -143,7 +143,7 @@ const expandSelectedNumber = (element, selectedValue) => {
 const onSelect = () => {
   const selection = window.getSelection();
   const selectedText = selection?.toString().trim() || '';
-  const selectedValue = extractSubscriberCount(selectedText);
+  const selectedValue = parseSelectedSubscriberCount(selectedText);
   if (selectedValue === null || !selection?.rangeCount || selection.isCollapsed) {
     chrome.runtime.sendMessage({ type: 'youtubeStatus', status: '登録者数の数字だけをドラッグ選択してください' });
     return;
