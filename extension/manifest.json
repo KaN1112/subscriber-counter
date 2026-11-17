@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "OBS登録者カウンター",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "YouTube Studioで選択した登録者数をOBSのテキストソースへ反映します。",
   "minimum_chrome_version": "116",
   "permissions": ["storage", "activeTab", "tabs", "alarms"],

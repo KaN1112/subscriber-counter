@@ -101,7 +101,7 @@ const stopSelection = () => {
   selecting = false;
   guideElement?.remove();
   guideElement = null;
-  document.removeEventListener('mouseup', onSelect, true);
+  document.removeEventListener('mouseup', onSelectionMouseUp);
   document.removeEventListener('keydown', onSelectionKey, true);
 };
 
@@ -151,11 +151,15 @@ const onSelect = () => {
   selection.removeAllRanges();
 };
 
+const onSelectionMouseUp = () => {
+  setTimeout(onSelect, 0);
+};
+
 const startSelection = () => {
   if (selecting) return;
   selecting = true;
   showSelectionGuide();
-  document.addEventListener('mouseup', onSelect, true);
+  document.addEventListener('mouseup', onSelectionMouseUp);
   document.addEventListener('keydown', onSelectionKey, true);
   chrome.runtime.sendMessage({ type: 'youtubeStatus', status: '登録者数をドラッグ選択してください。Escで中止できます' });
 };

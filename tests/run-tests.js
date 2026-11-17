@@ -76,7 +76,8 @@ const tests = [
     assert.match(serviceWorker, /OBS更新失敗/);
     const contentScript = fs.readFileSync(path.join(__dirname, '../extension/content.js'), 'utf8');
     assert.match(contentScript, /window\.getSelection\(\)/);
-    assert.match(contentScript, /addEventListener\('mouseup'/);
+    assert.match(contentScript, /addEventListener\('mouseup', onSelectionMouseUp\)/);
+    assert.match(contentScript, /setTimeout\(onSelect, 0\)/);
     assert.match(contentScript, /}, 1000\)/);
   }
 ];

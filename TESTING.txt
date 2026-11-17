@@ -1,4 +1,4 @@
-OBS登録者カウンター v2.1.0 テスト手順
+OBS登録者カウンター v2.1.1 テスト手順
 
 自動テスト
 node tests/run-tests.js
