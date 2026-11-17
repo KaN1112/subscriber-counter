@@ -1,4 +1,4 @@
-OBS登録者カウンター Pre-release v2.1.8 テスト手順
+OBS登録者カウンター Pre-release v2.1.9 テスト手順
 
 自動テスト
 node tests/run-tests.js

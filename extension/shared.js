@@ -50,6 +50,19 @@
     const previousDigits = String(safePrevious);
     if (observedDigits.length <= previousDigits.length) return safeObserved;
 
+    if (observedDigits.startsWith(previousDigits)) {
+      const remainder = observedDigits.slice(previousDigits.length);
+      const transitionCandidates = [];
+      if (remainder && remainder[0] !== '0') transitionCandidates.push(Number(remainder));
+      if (remainder.length < previousDigits.length) {
+        transitionCandidates.push(Number(previousDigits.slice(0, -remainder.length) + remainder));
+      }
+      const transition = transitionCandidates
+        .filter(value => value !== safePrevious && Math.abs(value - safePrevious) <= 10)
+        .sort((a, b) => Math.abs(a - safePrevious) - Math.abs(b - safePrevious))[0];
+      if (transition !== undefined) return transition;
+    }
+
     const lengths = [previousDigits.length, previousDigits.length + 1];
     const candidates = new Set();
     const collect = (start, remaining, value) => {
@@ -63,11 +76,11 @@
     };
     lengths.filter(length => length <= observedDigits.length).forEach(length => collect(0, length, ''));
 
-    const next = [...candidates]
-      .filter(value => value > safePrevious && value - safePrevious <= 10)
-      .sort((a, b) => a - b)[0];
-    if (next !== undefined) return next;
     if (candidates.has(safePrevious)) return safePrevious;
+    const next = [...candidates]
+      .filter(value => value !== safePrevious && Math.abs(value - safePrevious) <= 10)
+      .sort((a, b) => Math.abs(a - safePrevious) - Math.abs(b - safePrevious))[0];
+    if (next !== undefined) return next;
     return safeObserved;
   };
 

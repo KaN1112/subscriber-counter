@@ -42,6 +42,9 @@ const tests = [
   () => assert.equal(stabilizeSubscriberCount(16512, 1652), 1652),
   () => assert.equal(stabilizeSubscriberCount(16523, 1652), 1653),
   () => assert.equal(stabilizeSubscriberCount(9991000, 999), 1000),
+  () => assert.equal(stabilizeSubscriberCount(16521, 1652), 1651),
+  () => assert.equal(stabilizeSubscriberCount(16521, 1651), 1651),
+  () => assert.equal(stabilizeSubscriberCount(1000999, 1000), 999),
   () => assert.equal(stabilizeSubscriberCount(1653, 1652), 1653),
   () => assert.equal(extractLikelySubscriberCount('登録者 1 6 5 0　過去28日 12'), 1650),
   () => assert.equal(extractLikelySubscriberCount('登録者 1,650　目標 1000'), 1650),
@@ -73,7 +76,7 @@ const tests = [
   () => {
     const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '../extension/manifest.json'), 'utf8'));
     assert.equal(manifest.manifest_version, 3);
-    assert.equal(manifest.version_name, 'Pre-release v2.1.8');
+    assert.equal(manifest.version_name, 'Pre-release v2.1.9');
     assert.equal(manifest.minimum_chrome_version, '116');
     assert.deepEqual(manifest.host_permissions, ['https://studio.youtube.com/*']);
   },
