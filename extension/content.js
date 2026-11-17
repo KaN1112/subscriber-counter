@@ -1,4 +1,4 @@
-const { extractSubscriberCount, findBestSubscriberCandidate } = CounterUtils;
+const { extractLikelySubscriberCount, findBestSubscriberCandidate } = CounterUtils;
 
 let selectedElement = null;
 let selectedSelector = '';
@@ -134,7 +134,9 @@ const subscriberTextsForElement = element => [
 ];
 
 const subscriberValueForElement = element => {
-  const candidate = findBestSubscriberCandidate(subscriberTextsForElement(element));
+  const candidate = findBestSubscriberCandidate(
+    subscriberTextsForElement(element).map(extractLikelySubscriberCount)
+  );
   return candidate?.value ?? null;
 };
 

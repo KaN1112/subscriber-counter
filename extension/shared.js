@@ -33,6 +33,25 @@
     return parseSubscriberCount(matches[0]);
   };
 
+  const extractLikelySubscriberCount = value => {
+    let normalized = String(value ?? '')
+      .replace(/[０-９]/g, digit => String.fromCharCode(digit.charCodeAt(0) - 0xFEE0))
+      .replace(/，/g, ',')
+      .replace(/[\u200B-\u200D\uFEFF]/g, '');
+    if (/\d+(?:\.\d+)?\s*(?:K|M|B|万|億)/i.test(normalized) || /\d+\.\d+/.test(normalized)) return null;
+
+    normalized = normalized.replace(/(?:\d\s+){2,}\d/g, sequence => sequence.replace(/\s/g, ''));
+    const matches = normalized.match(/\d{1,3}(?:,\d{3})+|\d+/g) || [];
+    let best = null;
+    for (const match of matches) {
+      const count = parseSubscriberCount(match);
+      if (count === null) continue;
+      const digitCount = String(count).length;
+      if (!best || digitCount > best.digitCount) best = { value: count, digitCount };
+    }
+    return best?.value ?? null;
+  };
+
   const findBestSubscriberCandidate = values => {
     let best = null;
     values.forEach((value, index) => {
@@ -119,6 +138,7 @@
     parseSubscriberCount,
     parsePositiveInteger,
     extractSubscriberCount,
+    extractLikelySubscriberCount,
     findBestSubscriberCandidate,
     formatCounter,
     nextAutomaticTarget,

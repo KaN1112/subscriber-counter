@@ -9,6 +9,7 @@ const {
   parseSubscriberCount,
   parsePositiveInteger,
   extractSubscriberCount,
+  extractLikelySubscriberCount,
   findBestSubscriberCandidate,
   formatCounter,
   nextAutomaticTarget,
@@ -30,6 +31,9 @@ const tests = [
   () => assert.equal(extractSubscriberCount('登録者 1\u200b6\u200b5\u200b0 人'), 1650),
   () => assert.equal(extractSubscriberCount('1.2K subscribers'), null),
   () => assert.equal(extractSubscriberCount('100 / 1000'), null),
+  () => assert.equal(extractLikelySubscriberCount('登録者 1 6 5 0　過去28日 12'), 1650),
+  () => assert.equal(extractLikelySubscriberCount('登録者 1,650　目標 1000'), 1650),
+  () => assert.equal(extractLikelySubscriberCount('5'), 5),
   () => assert.deepEqual(
     findBestSubscriberCandidate(['5', '1650', '登録者 1650人', '1650 1000']),
     { index: 1, value: 1650 }
