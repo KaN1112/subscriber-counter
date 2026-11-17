@@ -42,6 +42,35 @@
     return digits ? parseSubscriberCount(digits) : null;
   };
 
+  const stabilizeSubscriberCount = (observed, previous) => {
+    const safeObserved = parseSubscriberCount(observed);
+    const safePrevious = parseSubscriberCount(previous);
+    if (safeObserved === null || safePrevious === null) return safeObserved;
+    const observedDigits = String(safeObserved);
+    const previousDigits = String(safePrevious);
+    if (observedDigits.length <= previousDigits.length) return safeObserved;
+
+    const lengths = [previousDigits.length, previousDigits.length + 1];
+    const candidates = new Set();
+    const collect = (start, remaining, value) => {
+      if (remaining === 0) {
+        if (value[0] !== '0') candidates.add(Number(value));
+        return;
+      }
+      for (let index = start; index <= observedDigits.length - remaining; index += 1) {
+        collect(index + 1, remaining - 1, value + observedDigits[index]);
+      }
+    };
+    lengths.filter(length => length <= observedDigits.length).forEach(length => collect(0, length, ''));
+
+    const next = [...candidates]
+      .filter(value => value > safePrevious && value - safePrevious <= 10)
+      .sort((a, b) => a - b)[0];
+    if (next !== undefined) return next;
+    if (candidates.has(safePrevious)) return safePrevious;
+    return safeObserved;
+  };
+
   const extractLikelySubscriberCount = value => {
     let normalized = String(value ?? '')
       .replace(/[０-９]/g, digit => String.fromCharCode(digit.charCodeAt(0) - 0xFEE0))
@@ -148,6 +177,7 @@
     parsePositiveInteger,
     extractSubscriberCount,
     parseSelectedSubscriberCount,
+    stabilizeSubscriberCount,
     extractLikelySubscriberCount,
     findBestSubscriberCandidate,
     formatCounter,

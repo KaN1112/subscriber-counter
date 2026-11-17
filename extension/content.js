@@ -1,4 +1,9 @@
-const { extractSubscriberCount, parseSelectedSubscriberCount, findBestSubscriberCandidate } = CounterUtils;
+const {
+  extractSubscriberCount,
+  parseSelectedSubscriberCount,
+  stabilizeSubscriberCount,
+  findBestSubscriberCandidate
+} = CounterUtils;
 
 let selectedElement = null;
 let selectedSelector = '';
@@ -55,7 +60,8 @@ const readSelectedValue = () => {
     chrome.runtime.sendMessage({ type: 'youtubeStatus', status: '選択要素を再検出中' });
     return;
   }
-  const value = subscriberValueForElement(selectedElement);
+  const observedValue = subscriberValueForElement(selectedElement);
+  const value = stabilizeSubscriberCount(observedValue, lastValue);
   if (value === null || value === lastValue) return;
   lastValue = value;
   chrome.runtime.sendMessage({ type: 'subscriberUpdate', value, selector: selectedSelector });
