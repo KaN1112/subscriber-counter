@@ -1,8 +1,7 @@
 const {
   extractSubscriberCount,
   parseSelectedSubscriberCount,
-  stabilizeSubscriberCount,
-  findBestSubscriberCandidate
+  stabilizeSubscriberCount
 } = CounterUtils;
 
 let selectedElement = null;
@@ -118,17 +117,21 @@ const onSelectionKey = event => {
 };
 
 const subscriberTextsForElement = element => [
-  element.textContent,
-  element.innerText,
+  element.getAttribute('aria-valuenow'),
+  element.getAttribute('aria-valuetext'),
   element.getAttribute('aria-label'),
-  element.getAttribute('title')
+  element.getAttribute('data-value'),
+  element.getAttribute('title'),
+  element.innerText,
+  element.textContent
 ];
 
 const subscriberValueForElement = element => {
-  const candidate = findBestSubscriberCandidate(
-    subscriberTextsForElement(element).map(value => parseSelectedSubscriberCount(value) ?? extractSubscriberCount(value))
-  );
-  return candidate?.value ?? null;
+  for (const text of subscriberTextsForElement(element)) {
+    const value = extractSubscriberCount(text) ?? parseSelectedSubscriberCount(text);
+    if (value !== null) return value;
+  }
+  return null;
 };
 
 const expandSelectedNumber = (element, selectedValue) => {

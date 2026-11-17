@@ -76,7 +76,7 @@ const tests = [
   () => {
     const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '../extension/manifest.json'), 'utf8'));
     assert.equal(manifest.manifest_version, 3);
-    assert.equal(manifest.version_name, 'Pre-release v2.1.9');
+    assert.equal(manifest.version_name, 'Pre-release v2.1.10');
     assert.equal(manifest.minimum_chrome_version, '116');
     assert.deepEqual(manifest.host_permissions, ['https://studio.youtube.com/*']);
   },
@@ -99,6 +99,8 @@ const tests = [
     assert.match(contentScript, /addEventListener\('mouseup', onSelectionMouseUp\)/);
     assert.match(contentScript, /setTimeout\(onSelect, 0\)/);
     assert.match(contentScript, /expandSelectedNumber/);
+    assert.match(contentScript, /aria-valuenow/);
+    assert.match(contentScript, /element\.innerText,[\s\S]*element\.textContent/);
     assert.match(contentScript, /}, 1000\)/);
     assert.match(contentScript, /currentElement !== selectedElement/);
     assert.doesNotMatch(contentScript, /attributeFilter/);
