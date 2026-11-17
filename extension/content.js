@@ -1,18 +1,17 @@
-const { extractLikelySubscriberCount, findBestSubscriberCandidate } = CounterUtils;
+const { extractSubscriberCount, findBestSubscriberCandidate } = CounterUtils;
 
 let selectedElement = null;
 let selectedSelector = '';
 let valueObserver = null;
 let documentObserver = null;
 let selecting = false;
-let hoveredElement = null;
 let lastValue = null;
 let guideElement = null;
 
 const showSelectionGuide = () => {
   guideElement?.remove();
   guideElement = document.createElement('div');
-  guideElement.textContent = '登録者数の数字をクリックしてください　Escで中止';
+  guideElement.textContent = '登録者数の数字だけをドラッグして選択してください　Escで中止';
   Object.assign(guideElement.style, {
     position: 'fixed',
     zIndex: '2147483647',
@@ -37,7 +36,7 @@ const selectorFor = element => {
   while (current && current !== document.body && parts.length < 8) {
     let part = current.localName;
     if (!part) break;
-    const stableAttribute = ['data-testid', 'aria-label'].find(name => current.hasAttribute(name));
+    const stableAttribute = ['data-testid'].find(name => current.hasAttribute(name));
     if (stableAttribute) {
       const value = CSS.escape(current.getAttribute(stableAttribute));
       part += `[${stableAttribute}="${value}"]`;
@@ -98,25 +97,12 @@ const ensureDocumentObserver = () => {
   documentObserver.observe(document.documentElement, { childList: true, subtree: true });
 };
 
-const clearHighlight = () => {
-  if (hoveredElement) hoveredElement.style.removeProperty('outline');
-  hoveredElement = null;
-};
-
 const stopSelection = () => {
   selecting = false;
   guideElement?.remove();
   guideElement = null;
-  clearHighlight();
-  document.removeEventListener('mouseover', onMouseOver, true);
-  document.removeEventListener('click', onSelect, true);
+  document.removeEventListener('mouseup', onSelect, true);
   document.removeEventListener('keydown', onSelectionKey, true);
-};
-
-const onMouseOver = event => {
-  clearHighlight();
-  hoveredElement = event.target;
-  hoveredElement.style.setProperty('outline', '2px solid #1676a7', 'important');
 };
 
 const onSelectionKey = event => {
@@ -135,48 +121,43 @@ const subscriberTextsForElement = element => [
 
 const subscriberValueForElement = element => {
   const candidate = findBestSubscriberCandidate(
-    subscriberTextsForElement(element).map(extractLikelySubscriberCount)
+    subscriberTextsForElement(element).map(extractSubscriberCount)
   );
   return candidate?.value ?? null;
 };
 
-const findSubscriberElement = (clickedElement, eventPath = []) => {
-  const elements = eventPath.filter(item => item instanceof Element).slice(0, 16);
-  let current = clickedElement;
-  while (current && current !== document.body && elements.length < 16) {
-    if (!elements.includes(current)) elements.push(current);
-    current = current.parentElement;
-  }
-
-  const candidates = elements.map(element => ({ element, value: subscriberValueForElement(element) }));
-  const candidate = findBestSubscriberCandidate(candidates.map(item => item.value));
-  return candidate ? candidates[candidate.index] : null;
-};
-
-const onSelect = event => {
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  const candidate = findSubscriberElement(event.target, event.composedPath());
-  if (!candidate) {
-    chrome.runtime.sendMessage({ type: 'youtubeStatus', status: '整数が表示された要素を選択してください' });
+const onSelect = () => {
+  const selection = window.getSelection();
+  const selectedText = selection?.toString().trim() || '';
+  const value = extractSubscriberCount(selectedText);
+  if (value === null || !selection?.rangeCount || selection.isCollapsed) {
+    chrome.runtime.sendMessage({ type: 'youtubeStatus', status: '登録者数の数字だけをドラッグ選択してください' });
     return;
   }
-  const { element, value } = candidate;
+
+  const range = selection.getRangeAt(0);
+  const commonNode = range.commonAncestorContainer;
+  const element = commonNode.nodeType === Node.ELEMENT_NODE ? commonNode : commonNode.parentElement;
+  if (!element || element === document.body || element === document.documentElement) {
+    chrome.runtime.sendMessage({ type: 'youtubeStatus', status: '数字部分だけを狭くドラッグ選択してください' });
+    return;
+  }
+
   selectedSelector = selectorFor(element);
   stopSelection();
   observeElement(element);
   ensureDocumentObserver();
   chrome.runtime.sendMessage({ type: 'selectionSaved', selector: selectedSelector, value });
+  selection.removeAllRanges();
 };
 
 const startSelection = () => {
   if (selecting) return;
   selecting = true;
   showSelectionGuide();
-  document.addEventListener('mouseover', onMouseOver, true);
-  document.addEventListener('click', onSelect, true);
+  document.addEventListener('mouseup', onSelect, true);
   document.addEventListener('keydown', onSelectionKey, true);
-  chrome.runtime.sendMessage({ type: 'youtubeStatus', status: '数字をクリックしてください。Escで中止できます' });
+  chrome.runtime.sendMessage({ type: 'youtubeStatus', status: '登録者数をドラッグ選択してください。Escで中止できます' });
 };
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -202,6 +183,11 @@ chrome.storage.local.get(CounterUtils.defaults).then(settings => {
     if (!restoreSelectedElement()) chrome.runtime.sendMessage({ type: 'youtubeStatus', status: '再選択が必要です' });
   }
 });
+
+setInterval(() => {
+  if (!selectedElement?.isConnected) return;
+  readSelectedValue();
+}, 1000);
 
 setInterval(() => {
   if (!selectedElement?.isConnected) return;

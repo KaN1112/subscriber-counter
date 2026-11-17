@@ -88,7 +88,7 @@ const startSelection = async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.url?.startsWith('https://studio.youtube.com/')) throw new Error('YouTube Studioの画面を開いてから実行してください。');
   await chrome.tabs.sendMessage(tab.id, { type: 'startSelection' });
-  showMessage('Studio画面で登録者数の整数をクリックしてください。');
+  showMessage('Studio画面で登録者数の数字だけをドラッグ選択してください。');
   window.close();
 };
 

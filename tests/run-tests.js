@@ -73,6 +73,11 @@ const tests = [
     assert.match(serviceWorker, /20000/);
     assert.match(serviceWorker, /overlay: true/);
     assert.match(serviceWorker, /更新後に登録者数を再選択してください/);
+    assert.match(serviceWorker, /OBS更新失敗/);
+    const contentScript = fs.readFileSync(path.join(__dirname, '../extension/content.js'), 'utf8');
+    assert.match(contentScript, /window\.getSelection\(\)/);
+    assert.match(contentScript, /addEventListener\('mouseup'/);
+    assert.match(contentScript, /}, 1000\)/);
   }
 ];
 
