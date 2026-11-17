@@ -87,6 +87,8 @@ const tests = [
     assert.match(contentScript, /setTimeout\(onSelect, 0\)/);
     assert.match(contentScript, /expandSelectedNumber/);
     assert.match(contentScript, /}, 1000\)/);
+    assert.match(contentScript, /currentElement !== selectedElement/);
+    assert.doesNotMatch(contentScript, /attributeFilter/);
     const popupScript = fs.readFileSync(path.join(__dirname, '../extension/popup.js'), 'utf8');
     assert.match(popupScript, /message\.type === 'stateChanged' && !formDirty/);
   }

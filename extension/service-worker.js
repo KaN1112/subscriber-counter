@@ -332,8 +332,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
       await updateObsText(false).catch(error => {
         runtimeState.error = `OBS更新失敗: ${error.message}`;
-        chrome.runtime.sendMessage({ type: 'stateChanged' }).catch(() => {});
       });
+      chrome.runtime.sendMessage({ type: 'stateChanged' }).catch(() => {});
       return { ok: true };
     }
     if (message.type === 'selectionSaved') {
@@ -347,8 +347,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
       await updateObsText(true).catch(error => {
         runtimeState.error = `OBS更新失敗: ${error.message}`;
-        chrome.runtime.sendMessage({ type: 'stateChanged' }).catch(() => {});
       });
+      chrome.runtime.sendMessage({ type: 'stateChanged' }).catch(() => {});
       return { ok: true };
     }
     if (message.type === 'youtubeStatus') {
@@ -393,7 +393,7 @@ const initialize = async () => {
 };
 
 chrome.runtime.onInstalled.addListener(async details => {
-  if (details.reason === 'update' && ['2.0.0', '2.0.1', '2.0.2', '2.0.3', '2.1.0', '2.1.1', '2.1.2', '2.1.3'].includes(details.previousVersion)) {
+  if (details.reason === 'update' && ['2.0.0', '2.0.1', '2.0.2', '2.0.3', '2.1.0', '2.1.1', '2.1.2', '2.1.3', '2.1.4'].includes(details.previousVersion)) {
     await chrome.storage.local.set({
       selectedSelector: '',
       selectedTabId: null,

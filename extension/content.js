@@ -69,8 +69,7 @@ const observeElement = element => {
     childList: true,
     subtree: true,
     characterData: true,
-    attributes: true,
-    attributeFilter: ['aria-label', 'title']
+    attributes: true
   });
   readSelectedValue();
 };
@@ -206,7 +205,19 @@ chrome.storage.local.get(CounterUtils.defaults).then(settings => {
 });
 
 setInterval(() => {
-  if (!selectedElement?.isConnected) return;
+  if (selectedSelector) {
+    let currentElement = null;
+    try {
+      currentElement = document.querySelector(selectedSelector);
+    } catch {
+      currentElement = null;
+    }
+    if (currentElement && currentElement !== selectedElement) observeElement(currentElement);
+  }
+  if (!selectedElement?.isConnected) {
+    restoreSelectedElement();
+    return;
+  }
   readSelectedValue();
 }, 1000);
 
