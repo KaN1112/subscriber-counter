@@ -67,6 +67,7 @@ const tests = [
   () => {
     const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '../extension/manifest.json'), 'utf8'));
     assert.equal(manifest.manifest_version, 3);
+    assert.equal(manifest.version_name, 'Pre-release v2.1.7');
     assert.equal(manifest.minimum_chrome_version, '116');
     assert.deepEqual(manifest.host_permissions, ['https://studio.youtube.com/*']);
   },
@@ -82,6 +83,7 @@ const tests = [
     assert.match(serviceWorker, /OBS更新失敗/);
     assert.match(serviceWorker, /接続または認証がタイムアウト/);
     assert.match(serviceWorker, /if \(identified\) finish\(resolve/);
+    assert.match(serviceWorker, /if \(runtimeState\.socket !== socket\) return/);
     assert.match(serviceWorker, /message\.type === 'selectionSaved'[\s\S]*?updateObsText\(true\)/);
     const contentScript = fs.readFileSync(path.join(__dirname, '../extension/content.js'), 'utf8');
     assert.match(contentScript, /window\.getSelection\(\)/);

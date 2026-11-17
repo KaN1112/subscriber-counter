@@ -80,7 +80,7 @@ const scheduleReconnect = async () => {
   runtimeState.reconnectTimer = setTimeout(() => connectObs().catch(() => {}), delay);
 };
 
-const handleSocketMessage = async event => {
+const handleSocketMessage = async (event, socket) => {
   let message;
   try {
     message = JSON.parse(event.data);
@@ -92,7 +92,7 @@ const handleSocketMessage = async event => {
     if (message.d.authentication) {
       if (!runtimeState.password) {
         setStatus('認証エラー', 'OBS WebSocketのパスワードを入力してください。');
-        runtimeState.socket.close();
+        socket.close();
         return;
       }
       identify.authentication = await CounterUtils.createObsAuthentication(
@@ -101,7 +101,7 @@ const handleSocketMessage = async event => {
         message.d.authentication.challenge
       );
     }
-    runtimeState.socket.send(JSON.stringify({ op: 1, d: identify }));
+    socket.send(JSON.stringify({ op: 1, d: identify }));
     return;
   }
   if (message.op === 2) {
@@ -158,7 +158,8 @@ const connectObs = async config => {
       finish(reject, new Error('OBSへの接続または認証がタイムアウトしました。'));
     }, 8000);
     socket.addEventListener('message', event => {
-      handleSocketMessage(event)
+      if (runtimeState.socket !== socket) return;
+      handleSocketMessage(event, socket)
         .then(identified => {
           if (identified) finish(resolve, { ok: true });
         })
@@ -168,9 +169,11 @@ const connectObs = async config => {
         });
     });
     socket.addEventListener('error', () => {
+      if (runtimeState.socket !== socket) return;
       setStatus('接続エラー', 'OBSが起動しているか、接続先とポートを確認してください。');
     });
     socket.addEventListener('close', event => {
+      if (runtimeState.socket !== socket) return;
       finish(reject, new Error(event.code === 4009 ? 'パスワードが正しくありません。' : 'OBSとの接続が切れました。'));
       stopKeepAlive();
       clearPending(new Error('OBSとの接続が切れました。'));
@@ -403,7 +406,7 @@ const initialize = async () => {
 };
 
 chrome.runtime.onInstalled.addListener(async details => {
-  if (details.reason === 'update' && ['2.0.0', '2.0.1', '2.0.2', '2.0.3', '2.1.0', '2.1.1', '2.1.2', '2.1.3', '2.1.4', '2.1.5'].includes(details.previousVersion)) {
+  if (details.reason === 'update' && ['2.0.0', '2.0.1', '2.0.2', '2.0.3', '2.1.0', '2.1.1', '2.1.2', '2.1.3', '2.1.4', '2.1.5', '2.1.6'].includes(details.previousVersion)) {
     await chrome.storage.local.set({
       selectedSelector: '',
       selectedTabId: null,
