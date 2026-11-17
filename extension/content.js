@@ -56,7 +56,7 @@ const readSelectedValue = () => {
     chrome.runtime.sendMessage({ type: 'youtubeStatus', status: '選択要素を再検出中' });
     return;
   }
-  const value = extractSubscriberCount(selectedElement.textContent);
+  const value = subscriberValueForElement(selectedElement);
   if (value === null || value === lastValue) return;
   lastValue = value;
   chrome.runtime.sendMessage({ type: 'subscriberUpdate', value, selector: selectedSelector });
@@ -66,7 +66,13 @@ const observeElement = element => {
   valueObserver?.disconnect();
   selectedElement = element;
   valueObserver = new MutationObserver(readSelectedValue);
-  valueObserver.observe(element, { childList: true, subtree: true, characterData: true });
+  valueObserver.observe(element, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: ['aria-label', 'title']
+  });
   readSelectedValue();
 };
 
@@ -120,22 +126,35 @@ const onSelectionKey = event => {
   }
 };
 
-const findSubscriberElement = clickedElement => {
-  const elements = [];
+const subscriberTextsForElement = element => [
+  element.textContent,
+  element.innerText,
+  element.getAttribute('aria-label'),
+  element.getAttribute('title')
+];
+
+const subscriberValueForElement = element => {
+  const candidate = findBestSubscriberCandidate(subscriberTextsForElement(element));
+  return candidate?.value ?? null;
+};
+
+const findSubscriberElement = (clickedElement, eventPath = []) => {
+  const elements = eventPath.filter(item => item instanceof Element).slice(0, 16);
   let current = clickedElement;
-  while (current && current !== document.body && elements.length < 8) {
-    elements.push(current);
+  while (current && current !== document.body && elements.length < 16) {
+    if (!elements.includes(current)) elements.push(current);
     current = current.parentElement;
   }
 
-  const candidate = findBestSubscriberCandidate(elements.map(element => element.textContent));
-  return candidate ? { element: elements[candidate.index], value: candidate.value } : null;
+  const candidates = elements.map(element => ({ element, value: subscriberValueForElement(element) }));
+  const candidate = findBestSubscriberCandidate(candidates.map(item => item.value));
+  return candidate ? candidates[candidate.index] : null;
 };
 
 const onSelect = event => {
   event.preventDefault();
   event.stopImmediatePropagation();
-  const candidate = findSubscriberElement(event.target);
+  const candidate = findSubscriberElement(event.target, event.composedPath());
   if (!candidate) {
     chrome.runtime.sendMessage({ type: 'youtubeStatus', status: '整数が表示された要素を選択してください' });
     return;

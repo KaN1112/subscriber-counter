@@ -17,10 +17,17 @@
   };
 
   const extractSubscriberCount = value => {
-    const normalized = String(value ?? '')
+    let normalized = String(value ?? '')
       .replace(/[０-９]/g, digit => String.fromCharCode(digit.charCodeAt(0) - 0xFEE0))
-      .replace(/，/g, ',');
+      .replace(/，/g, ',')
+      .replace(/[\u200B-\u200D\uFEFF]/g, '');
     if (/\d+(?:\.\d+)?\s*(?:K|M|B|万|億)/i.test(normalized) || /\d+\.\d+/.test(normalized)) return null;
+
+    const digitTokens = normalized.match(/\d+/g);
+    if (digitTokens?.length > 1 && digitTokens.every(token => token.length === 1)) {
+      normalized = normalized.replace(/(?<=\d)\s+(?=\d)/g, '');
+    }
+
     const matches = normalized.match(/\d{1,3}(?:,\d{3})+|\d+/g);
     if (!matches || matches.length !== 1) return null;
     return parseSubscriberCount(matches[0]);
