@@ -161,6 +161,7 @@ const onSelect = () => {
 
   selectedSelector = selectorFor(element);
   stopSelection();
+  lastValue = value;
   observeElement(element);
   ensureDocumentObserver();
   chrome.runtime.sendMessage({ type: 'selectionSaved', selector: selectedSelector, value });

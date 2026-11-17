@@ -74,6 +74,7 @@ const tests = [
     assert.match(serviceWorker, /overlay: true/);
     assert.match(serviceWorker, /更新後に登録者数を再選択してください/);
     assert.match(serviceWorker, /OBS更新失敗/);
+    assert.match(serviceWorker, /message\.type === 'selectionSaved'[\s\S]*?updateObsText\(true\)/);
     const contentScript = fs.readFileSync(path.join(__dirname, '../extension/content.js'), 'utf8');
     assert.match(contentScript, /window\.getSelection\(\)/);
     assert.match(contentScript, /addEventListener\('mouseup', onSelectionMouseUp\)/);

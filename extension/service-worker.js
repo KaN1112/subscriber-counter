@@ -345,7 +345,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         current: message.value,
         lastCapturedAt: new Date().toISOString()
       });
-      await updateObsText(false).catch(error => {
+      await updateObsText(true).catch(error => {
         runtimeState.error = `OBS更新失敗: ${error.message}`;
         chrome.runtime.sendMessage({ type: 'stateChanged' }).catch(() => {});
       });
@@ -393,7 +393,7 @@ const initialize = async () => {
 };
 
 chrome.runtime.onInstalled.addListener(async details => {
-  if (details.reason === 'update' && ['2.0.0', '2.0.1', '2.0.2', '2.0.3', '2.1.0', '2.1.1'].includes(details.previousVersion)) {
+  if (details.reason === 'update' && ['2.0.0', '2.0.1', '2.0.2', '2.0.3', '2.1.0', '2.1.1', '2.1.2'].includes(details.previousVersion)) {
     await chrome.storage.local.set({
       selectedSelector: '',
       selectedTabId: null,
