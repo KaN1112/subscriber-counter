@@ -32,6 +32,7 @@ h3 { margin:0 0 10px; font-size:17px; }
 .steps { margin:0; padding:0; list-style:none; border-top:1px solid var(--ink); counter-reset:step; }
 .steps li { display:grid; grid-template-columns:72px 1fr; gap:12px; padding:28px 0; border-bottom:1px solid var(--line); counter-increment:step; }
 .steps li::before { content:counter(step,decimal-leading-zero); color:var(--blue); font-size:13px; font-weight:800; }
+.setup-video { margin:32px 0 0; }
 .muted-section { background:var(--soft); }
 .two-column { display:grid; grid-template-columns:.8fr 1.2fr; gap:80px; }
 .two-column h2 { margin-bottom:0; }

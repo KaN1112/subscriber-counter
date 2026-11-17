@@ -9,6 +9,7 @@ const {
   parseSubscriberCount,
   parsePositiveInteger,
   extractSubscriberCount,
+  findBestSubscriberCandidate,
   formatCounter,
   nextAutomaticTarget,
   buildObsUrl,
@@ -26,6 +27,14 @@ const tests = [
   () => assert.equal(extractSubscriberCount('1,234 subscribers'), 1234),
   () => assert.equal(extractSubscriberCount('1.2K subscribers'), null),
   () => assert.equal(extractSubscriberCount('100 / 1000'), null),
+  () => assert.deepEqual(
+    findBestSubscriberCandidate(['5', '1650', '登録者 1650人', '1650 1000']),
+    { index: 1, value: 1650 }
+  ),
+  () => assert.deepEqual(
+    findBestSubscriberCandidate(['０', '１，６５０', '登録者 １，６５０人']),
+    { index: 1, value: 1650 }
+  ),
   () => assert.equal(formatCounter(777, 1000, ' / '), '777 / 1,000'),
   () => assert.equal(formatCounter(777, 1000, '｜', '{current}{separator}{target}人'), '777｜1,000人'),
   () => assert.equal(nextAutomaticTarget(1000, 1000), 2000),

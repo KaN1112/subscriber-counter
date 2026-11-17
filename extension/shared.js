@@ -26,6 +26,17 @@
     return parseSubscriberCount(matches[0]);
   };
 
+  const findBestSubscriberCandidate = values => {
+    let best = null;
+    values.forEach((value, index) => {
+      const count = extractSubscriberCount(value);
+      if (count === null) return;
+      const digitCount = String(count).length;
+      if (!best || digitCount > best.digitCount) best = { index, value: count, digitCount };
+    });
+    return best && { index: best.index, value: best.value };
+  };
+
   const formatCounter = (current, target, separator = ' / ', template = '{current}{separator}{target}') => {
     const safeCurrent = parseSubscriberCount(current);
     const safeTarget = parsePositiveInteger(target);
@@ -101,6 +112,7 @@
     parseSubscriberCount,
     parsePositiveInteger,
     extractSubscriberCount,
+    findBestSubscriberCandidate,
     formatCounter,
     nextAutomaticTarget,
     isLocalHost,

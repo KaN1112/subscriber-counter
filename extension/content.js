@@ -1,4 +1,4 @@
-const { extractSubscriberCount } = CounterUtils;
+const { extractSubscriberCount, findBestSubscriberCandidate } = CounterUtils;
 
 let selectedElement = null;
 let selectedSelector = '';
@@ -120,15 +120,27 @@ const onSelectionKey = event => {
   }
 };
 
+const findSubscriberElement = clickedElement => {
+  const elements = [];
+  let current = clickedElement;
+  while (current && current !== document.body && elements.length < 8) {
+    elements.push(current);
+    current = current.parentElement;
+  }
+
+  const candidate = findBestSubscriberCandidate(elements.map(element => element.textContent));
+  return candidate ? { element: elements[candidate.index], value: candidate.value } : null;
+};
+
 const onSelect = event => {
   event.preventDefault();
   event.stopImmediatePropagation();
-  const element = event.target;
-  const value = extractSubscriberCount(element.textContent);
-  if (value === null) {
+  const candidate = findSubscriberElement(event.target);
+  if (!candidate) {
     chrome.runtime.sendMessage({ type: 'youtubeStatus', status: '整数が表示された要素を選択してください' });
     return;
   }
+  const { element, value } = candidate;
   selectedSelector = selectorFor(element);
   stopSelection();
   observeElement(element);
