@@ -385,6 +385,15 @@ const initialize = async () => {
   if (settings.autoConnect) connectObs().catch(() => {});
 };
 
-chrome.runtime.onInstalled.addListener(initialize);
+chrome.runtime.onInstalled.addListener(async details => {
+  if (details.reason === 'update' && ['2.0.0', '2.0.1'].includes(details.previousVersion)) {
+    await chrome.storage.local.set({
+      selectedSelector: '',
+      selectedTabId: null,
+      youtubeStatus: '更新後に登録者数を再選択してください'
+    });
+  }
+  await initialize();
+});
 chrome.runtime.onStartup.addListener(initialize);
 initialize();

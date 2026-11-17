@@ -68,6 +68,7 @@ const tests = [
     assert.match(serviceWorker, /GetVersion/);
     assert.match(serviceWorker, /20000/);
     assert.match(serviceWorker, /overlay: true/);
+    assert.match(serviceWorker, /更新後に登録者数を再選択してください/);
   }
 ];
 
