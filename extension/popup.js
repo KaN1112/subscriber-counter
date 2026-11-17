@@ -33,27 +33,30 @@ const formatDate = value => {
   return Number.isNaN(date.getTime()) ? '未取得' : date.toLocaleString('ja-JP');
 };
 
-const renderState = state => {
+const renderState = (state, preserveForm = false) => {
   const { settings, obs, youtubeActive, preview } = state;
+  const pendingInputName = elements['input-name'].value;
   elements['current-value'].textContent = settings.current ?? '未取得';
   elements['manual-current'].value = settings.current ?? '';
   elements['captured-at'].textContent = formatDate(settings.lastCapturedAt);
   elements['youtube-status'].textContent = youtubeActive ? settings.youtubeStatus : settings.selectedSelector ? '停止中・Studioを開いてください' : settings.youtubeStatus;
   elements['obs-status'].textContent = obs.status;
-  elements['host'].value = settings.host;
-  elements['port'].value = settings.port;
-  elements['password'].value = settings.savePassword ? settings.password : '';
-  elements['save-password'].checked = settings.savePassword;
-  elements['target'].value = settings.target;
-  elements['separator'].value = settings.separator;
-  elements['template'].value = settings.template;
-  elements['auto-target'].checked = settings.autoTarget;
-  elements['auto-connect'].checked = settings.autoConnect;
+  if (!preserveForm) {
+    elements['host'].value = settings.host;
+    elements['port'].value = settings.port;
+    elements['password'].value = settings.savePassword ? settings.password : '';
+    elements['save-password'].checked = settings.savePassword;
+    elements['target'].value = settings.target;
+    elements.separator.value = settings.separator;
+    elements.template.value = settings.template;
+    elements['auto-target'].checked = settings.autoTarget;
+    elements['auto-connect'].checked = settings.autoConnect;
+  }
   elements['preview'].textContent = preview || '--- / 1,000';
 
   elements['input-name'].replaceChildren(option('', obs.status === '接続済み' ? 'テキストソースを選択' : '接続後に選択'));
   obs.sources.forEach(source => elements['input-name'].append(option(source.inputName, `${source.inputName}（${source.inputKind}）`)));
-  elements['input-name'].value = settings.inputName;
+  elements['input-name'].value = preserveForm ? pendingInputName : settings.inputName;
 
   elements['scene-name'].replaceChildren(option('', obs.status === '接続済み' ? 'シーンを選択' : '接続後に選択'));
   obs.scenes.forEach(scene => elements['scene-name'].append(option(scene.sceneName, scene.sceneName)));
@@ -72,7 +75,7 @@ const renderState = state => {
   if (obs.error) showMessage(obs.error, true);
 };
 
-const loadState = async () => renderState(await send({ type: 'getState' }));
+const loadState = async (preserveForm = false) => renderState(await send({ type: 'getState' }), preserveForm);
 
 const withAction = async action => {
   try {
@@ -169,7 +172,7 @@ elements['reset-settings'].addEventListener('click', () => {
 });
 
 chrome.runtime.onMessage.addListener(message => {
-  if (message.type === 'stateChanged' && !formDirty) loadState().catch(error => showMessage(error.message, true));
+  if (message.type === 'stateChanged') loadState(formDirty).catch(error => showMessage(error.message, true));
 });
 
 loadState().catch(error => showMessage(error.message, true));

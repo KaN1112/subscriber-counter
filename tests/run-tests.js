@@ -80,6 +80,8 @@ const tests = [
     assert.match(serviceWorker, /overlay: true/);
     assert.match(serviceWorker, /更新後に登録者数を再選択してください/);
     assert.match(serviceWorker, /OBS更新失敗/);
+    assert.match(serviceWorker, /接続または認証がタイムアウト/);
+    assert.match(serviceWorker, /if \(identified\) finish\(resolve/);
     assert.match(serviceWorker, /message\.type === 'selectionSaved'[\s\S]*?updateObsText\(true\)/);
     const contentScript = fs.readFileSync(path.join(__dirname, '../extension/content.js'), 'utf8');
     assert.match(contentScript, /window\.getSelection\(\)/);
@@ -90,7 +92,8 @@ const tests = [
     assert.match(contentScript, /currentElement !== selectedElement/);
     assert.doesNotMatch(contentScript, /attributeFilter/);
     const popupScript = fs.readFileSync(path.join(__dirname, '../extension/popup.js'), 'utf8');
-    assert.match(popupScript, /message\.type === 'stateChanged' && !formDirty/);
+    assert.match(popupScript, /loadState\(formDirty\)/);
+    assert.match(popupScript, /preserveForm/);
   }
 ];
 
