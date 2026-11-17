@@ -126,22 +126,38 @@ const subscriberValueForElement = element => {
   return candidate?.value ?? null;
 };
 
+const expandSelectedNumber = (element, selectedValue) => {
+  const selectedDigits = String(selectedValue);
+  let current = element;
+  let best = { element, value: selectedValue };
+  for (let depth = 0; current && current !== document.body && depth < 8; depth += 1) {
+    const value = subscriberValueForElement(current);
+    if (value !== null && String(value).endsWith(selectedDigits) && String(value).length > String(best.value).length) {
+      best = { element: current, value };
+    }
+    current = current.parentElement;
+  }
+  return best;
+};
+
 const onSelect = () => {
   const selection = window.getSelection();
   const selectedText = selection?.toString().trim() || '';
-  const value = extractSubscriberCount(selectedText);
-  if (value === null || !selection?.rangeCount || selection.isCollapsed) {
+  const selectedValue = extractSubscriberCount(selectedText);
+  if (selectedValue === null || !selection?.rangeCount || selection.isCollapsed) {
     chrome.runtime.sendMessage({ type: 'youtubeStatus', status: '登録者数の数字だけをドラッグ選択してください' });
     return;
   }
 
   const range = selection.getRangeAt(0);
   const commonNode = range.commonAncestorContainer;
-  const element = commonNode.nodeType === Node.ELEMENT_NODE ? commonNode : commonNode.parentElement;
-  if (!element || element === document.body || element === document.documentElement) {
+  const rangeElement = commonNode.nodeType === Node.ELEMENT_NODE ? commonNode : commonNode.parentElement;
+  if (!rangeElement || rangeElement === document.body || rangeElement === document.documentElement) {
     chrome.runtime.sendMessage({ type: 'youtubeStatus', status: '数字部分だけを狭くドラッグ選択してください' });
     return;
   }
+
+  const { element, value } = expandSelectedNumber(rangeElement, selectedValue);
 
   selectedSelector = selectorFor(element);
   stopSelection();

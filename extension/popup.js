@@ -1,4 +1,5 @@
 const elements = Object.fromEntries([...document.querySelectorAll('[id]')].map(element => [element.id, element]));
+let formDirty = false;
 
 const send = message => new Promise((resolve, reject) => {
   chrome.runtime.sendMessage(message, response => {
@@ -131,17 +132,21 @@ elements['create-source'].addEventListener('click', () => withAction(() => send(
   inputName: elements['new-input-name'].value
 })));
 
-elements['save-settings'].addEventListener('click', () => withAction(() => send({
-  type: 'saveSettings',
-  values: {
-    target: elements.target.value,
-    separator: elements.separator.value,
-    template: elements.template.value,
-    autoTarget: elements['auto-target'].checked,
-    autoConnect: elements['auto-connect'].checked,
-    inputName: elements['input-name'].value
-  }
-})));
+elements['save-settings'].addEventListener('click', () => withAction(async () => {
+  const result = await send({
+    type: 'saveSettings',
+    values: {
+      target: elements.target.value,
+      separator: elements.separator.value,
+      template: elements.template.value,
+      autoTarget: elements['auto-target'].checked,
+      autoConnect: elements['auto-connect'].checked,
+      inputName: elements['input-name'].value
+    }
+  });
+  formDirty = false;
+  return result;
+}));
 
 const updatePreview = () => {
   elements.preview.textContent = CounterUtils.formatCounter(
@@ -153,6 +158,10 @@ const updatePreview = () => {
 };
 
 ['manual-current', 'target', 'separator', 'template'].forEach(id => elements[id].addEventListener('input', updatePreview));
+['target', 'separator', 'template', 'auto-target', 'auto-connect', 'input-name'].forEach(id => {
+  elements[id].addEventListener('input', () => { formDirty = true; });
+  elements[id].addEventListener('change', () => { formDirty = true; });
+});
 
 elements['reset-settings'].addEventListener('click', () => {
   if (!confirm('保存した設定をすべて削除しますか？')) return;
@@ -160,7 +169,7 @@ elements['reset-settings'].addEventListener('click', () => {
 });
 
 chrome.runtime.onMessage.addListener(message => {
-  if (message.type === 'stateChanged') loadState().catch(error => showMessage(error.message, true));
+  if (message.type === 'stateChanged' && !formDirty) loadState().catch(error => showMessage(error.message, true));
 });
 
 loadState().catch(error => showMessage(error.message, true));
