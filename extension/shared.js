@@ -42,7 +42,7 @@
     return digits ? parseSubscriberCount(digits) : null;
   };
 
-  const stabilizeSubscriberCount = (observed, previous) => {
+  const stabilizeSubscriberCount = (observed, previous, preferTransition = false) => {
     const safeObserved = parseSubscriberCount(observed);
     const safePrevious = parseSubscriberCount(previous);
     if (safeObserved === null || safePrevious === null) return safeObserved;
@@ -76,10 +76,11 @@
     };
     lengths.filter(length => length <= observedDigits.length).forEach(length => collect(0, length, ''));
 
-    if (candidates.has(safePrevious)) return safePrevious;
     const next = [...candidates]
       .filter(value => value !== safePrevious && Math.abs(value - safePrevious) <= 10)
       .sort((a, b) => Math.abs(a - safePrevious) - Math.abs(b - safePrevious))[0];
+    if (preferTransition && next !== undefined) return next;
+    if (candidates.has(safePrevious)) return safePrevious;
     if (next !== undefined) return next;
     return safeObserved;
   };

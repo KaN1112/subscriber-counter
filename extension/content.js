@@ -11,6 +11,8 @@ let documentObserver = null;
 let selecting = false;
 let lastValue = null;
 let guideElement = null;
+let lastObservationSignature = null;
+let lastTransitionAt = 0;
 
 const showSelectionGuide = () => {
   guideElement?.remove();
@@ -60,15 +62,21 @@ const readSelectedValue = () => {
     return;
   }
   const observedValue = subscriberValueForElement(selectedElement);
-  const value = stabilizeSubscriberCount(observedValue, lastValue);
+  const observationSignature = `${observedValue}|${selectedElement.innerHTML}`;
+  if (observationSignature === lastObservationSignature) return;
+  const preferTransition = lastObservationSignature !== null && Date.now() - lastTransitionAt > 3000;
+  const value = stabilizeSubscriberCount(observedValue, lastValue, preferTransition);
+  lastObservationSignature = observationSignature;
   if (value === null || value === lastValue) return;
   lastValue = value;
+  lastTransitionAt = Date.now();
   chrome.runtime.sendMessage({ type: 'subscriberUpdate', value, selector: selectedSelector });
 };
 
 const observeElement = element => {
   valueObserver?.disconnect();
   selectedElement = element;
+  lastObservationSignature = null;
   valueObserver = new MutationObserver(readSelectedValue);
   valueObserver.observe(element, {
     childList: true,
